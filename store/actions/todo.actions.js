@@ -1,5 +1,6 @@
 import { todoService } from "../../services/todo.service.js"
-import { ADD_TODO, REMOVE_TODO, SET_TODOS, SET_IS_LOADING, store, UPDATE_TODO, SET_DONE_TODOS_PERCENT } from "../store.js"
+import { ADD_TODO, REMOVE_TODO, SET_TODOS, SET_IS_LOADING, UPDATE_TODO, SET_DONE_TODOS_PERCENT } from "../reducers/todo.reducer.js"
+import { store } from "../store.js"
 import { addActivity } from './user.actions.js'
 
 export function loadTodos(filterBy) {
@@ -26,7 +27,7 @@ export function saveTodo(todo) {
     const type = todo._id ? UPDATE_TODO : ADD_TODO
 
     return todoService.save(todo)
-        .then(({savedTodo, doneTodosPercent}) => {
+        .then(({ savedTodo, doneTodosPercent }) => {
             store.dispatch({ type, todo: savedTodo })
             _setTodosData(doneTodosPercent)
             return savedTodo
@@ -45,12 +46,27 @@ export function saveTodo(todo) {
 export function removeTodo(todoId) {
 
     return todoService.remove(todoId)
-        .then(({doneTodosPercent}) => {
+        .then(({ doneTodosPercent }) => {
             store.dispatch({ type: REMOVE_TODO, todoId })
             _setTodosData(doneTodosPercent)
         })
         .then(() => addActivity('Removed the Todo: ' + todoId))
         .catch(err => {
+            console.log('Todo actions -> Cannot remove todo:', err)
+            throw err
+        })
+}
+
+export function removeTodoOptimistic(todoId) {
+    store.dispatch({ type: REMOVE_TODO, todoId })
+
+    return todoService.remove(todoId)
+        .then(({ doneTodosPercent }) => {
+            _setTodosData(doneTodosPercent)
+        })
+        .then(() => addActivity('Removed the Todo: ' + todoId))
+        .catch(err => {
+            store.dispatch({ type: REMOVE_TODO_UNDO, todoId })
             console.log('Todo actions -> Cannot remove todo:', err)
             throw err
         })

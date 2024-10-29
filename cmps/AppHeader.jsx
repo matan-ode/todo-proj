@@ -15,9 +15,9 @@ import { showErrorMsg } from '../services/event-bus.service.js'
 export function AppHeader() {
     const navigate = useNavigate()
     // const [user, setUser] = useState(userService.getLoggedinUser())
-    const todos = useSelector((storeState) => storeState.todos)
-    const loggedinUser = useSelector((storeState) => storeState.loggedinUser)
-    const doneTodosPercent = useSelector((storeState) => storeState.doneTodosPercent)
+    const todos = useSelector((storeState) => storeState.todoModule.todos)
+    const loggedinUser = useSelector((storeState) => storeState.userModule.loggedinUser)
+    const doneTodosPercent = useSelector((storeState) => storeState.todoModule.doneTodosPercent)
 
 
     function onLogout() {
@@ -43,7 +43,7 @@ export function AppHeader() {
             <section className="header-container">
                 <h1>React Todo App</h1>
                 {loggedinUser ? (
-                    < section >
+                    < section className="flex" style={{gap: '30px'}}> 
                         <div>
                             <Link to={`/user/${loggedinUser._id}`}>Hello {loggedinUser.fullname}</Link>
                             <p>Your balance is {loggedinUser.balance}</p>

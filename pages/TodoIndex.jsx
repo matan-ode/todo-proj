@@ -4,20 +4,20 @@ const { Link, useSearchParams } = ReactRouterDOM
 
 import { TodoFilter } from "../cmps/TodoFilter.jsx"
 import { TodoList } from "../cmps/TodoList.jsx"
-import { loadTodos, removeTodo, saveTodo } from '../store/actions/todo.actions.js'
-import { SET_FILTER_BY } from '../store/store.js'
+import { loadTodos, removeTodo, removeTodoOptimistic, saveTodo } from '../store/actions/todo.actions.js'
+import { SET_FILTER_BY } from '../store/reducers/todo.reducer.js'
 import { changeBalance } from '../store/actions/user.actions.js'
 import { DataTable } from "../cmps/data-table/DataTable.jsx"
 import { todoService } from "../services/todo.service.js"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
-import { SET_TODOS } from "../store/store.js"
+import { SET_TODOS } from "../store/reducers/todo.reducer.js"
 
 
 export function TodoIndex() {
 
     // const [todos, setTodos] = useState(null)
-    const todos = useSelector(storeState => storeState.todos)
-    const isLoading = useSelector(storeState => storeState.isLoading)
+    const todos = useSelector(storeState => storeState.todoModule.todos)
+    const isLoading = useSelector(storeState => storeState.todoModule.isLoading)
 
 
     // Special hook for accessing search-params:
@@ -25,7 +25,7 @@ export function TodoIndex() {
     const defaultFilter = todoService.getFilterFromSearchParams(searchParams)
 
     // const [filterBy, setFilterBy] = useState(defaultFilter)
-    const filterBy = useSelector((storeState) => storeState.filterBy)
+    const filterBy = useSelector((storeState) => storeState.todoModule.filterBy)
 
     const dispatch = useDispatch()
 
@@ -40,7 +40,9 @@ export function TodoIndex() {
     function onRemoveTodo(todoId) {
         const ans = confirm('Do you want to delete this todo?')
         if (!ans) return
-        removeTodo(todoId)
+
+        // removeTodo(todoId)
+        removeTodoOptimistic(todoId)
             .then(() => {
                 showSuccessMsg(`Removed todo with ${todoId} id successfully`)
             })
@@ -63,7 +65,7 @@ export function TodoIndex() {
                 }
             })
             .catch(() => showErrorMsg('Had trouble updating the todo'))
-            .finally(() => filterBy.isDone !== 'all' ? loadTodos(filterBy):'')
+            .finally(() => filterBy.isDone !== 'all' ? loadTodos(filterBy) : '')
     }
     const { txt, importance, isDone } = defaultFilter
 

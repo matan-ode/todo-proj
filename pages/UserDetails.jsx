@@ -7,7 +7,7 @@ import { utilService } from '../services/util.service.js'
 import { updateUser } from '../store/actions/user.actions.js'
 
 export function UserDetails() {
-    const loggedinUser = useSelector((storeState) => storeState.loggedinUser)
+    const loggedinUser = useSelector((storeState) => storeState.userModule.loggedinUser)
     const [userToEdit, setUserToEdit] = useState(null)
     const navigate = useNavigate()
 
